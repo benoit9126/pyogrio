@@ -147,6 +147,8 @@ jobs:
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.2.1
+        env:
+          CIBW_BUILD: cp310-* cp311-* cp313t-* cp314t-*
 
       - uses: actions/upload-artifact@v5
         with:
@@ -234,6 +236,7 @@ jobs:
           # CIBW needs to know triplet for the correct install path
           VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
           CIBW_ARCHS: ${{ matrix.arch }}
+          CIBW_BUILD: cp310-* cp311-* cp313t-* cp314t-*
 
       - uses: actions/upload-artifact@v5
         with:

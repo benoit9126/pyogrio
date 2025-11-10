@@ -5,6 +5,7 @@ import platform
 import shutil
 import subprocess
 import sys
+import sysconfig
 
 from setuptools import Extension, setup, find_packages
 import versioneer
@@ -21,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 MIN_PYTHON_VERSION = (3, 10, 0)
+MIN_PYTHON_ABI_VERSION = (3, 11, 0)
 MIN_GDAL_VERSION = (2, 4, 0)
 
 
@@ -160,6 +162,15 @@ else:
     compile_time_env = {
         "CTE_GDAL_VERSION": gdal_version,
     }
+
+    compiler_directives = {}
+
+    # If no free-threading, then compile using the stable ABI
+    if (sysconfig.get_config_var("Py_GIL_DISABLED") != 1) and sys.version_info[:3] >= MIN_PYTHON_ABI_VERSION:
+        ext_options["define_macros"] = [
+             ("Py_LIMITED_API", (MIN_PYTHON_ABI_VERSION[0] << 24) + (MIN_PYTHON_ABI_VERSION[1] << 16))
+        ]
+        ext_options["py_limited_api"] = True
 
     ext_modules = cythonize(
         [
